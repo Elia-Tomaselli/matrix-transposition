@@ -8,6 +8,11 @@ OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 
 EXECUTABLE = out
 
+# Change executable extension to .exe if OS is Windows
+ifeq ($(OS), Windows_NT)
+    EXECUTABLE := $(EXECUTABLE).exe
+endif
+
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
