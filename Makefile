@@ -1,34 +1,63 @@
+# Usage: "make" or "make all" to compile the source files and create the executable
+#        "make debug" to compile the source files with debug flags
+# 			 "make run <args>" to run the executable with arguments
+#        "make clean" to remove object files and executable
+
 CC = gcc
 CFLAGS = -O3 -Wall -Wextra
+DEBUG_CFLAGS = -g
 
 SRCDIR = src
 OBJDIR = obj
-SOURCES = $(wildcard $(SRCDIR)/*.c)
-OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
+SOURCES := $(wildcard $(SRCDIR)/*.c)
+OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-EXECUTABLE = out
+TARGET = transpose
 
-# Change executable extension to .exe if OS is Windows
-ifeq ($(OS), Windows_NT)
-    EXECUTABLE := $(EXECUTABLE).exe
+# Update the target extension based on the OS
+ifeq ($(OS),Windows_NT)
+	TARGET := $(TARGET).exe
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		TARGET := $(TARGET).out
+	endif
+	ifeq ($(UNAME_S),Darwin)
+		TARGET := $(TARGET).app
+	endif
 endif
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(CFLAGS) $< -o $@
+all: $(TARGET)
+
+debug: CFLAGS += $(DEBUG_CFLAGS)
+debug: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Ensure obj directory exists before compiling any source file
 $(OBJECTS): | $(OBJDIR)
-
-# Create obj directory
 $(OBJDIR):
-	@mkdir -p $(OBJDIR)
+	mkdir -p $(OBJDIR)
 
-run: $(EXECUTABLE)
-	@./${EXECUTABLE}
+# If the first argument is "run"...
+ifeq (run,$(firstword $(MAKECMDGOALS)))
+  # Use the rest as arguments for "run"
+  ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(ARGS):;@:)
+endif
 
-.PHONY: clean
+# Run the executable
+run: $(TARGET)
+	./$(TARGET) $(ARGS)
+
+# Clean up object files and executable
 clean:
-	rm -rf $(OBJDIR) $(EXECUTABLE)
+	rm -rf $(OBJDIR)
+	rm -f $(TARGET)
+
+.PHONY: all debug run clean
