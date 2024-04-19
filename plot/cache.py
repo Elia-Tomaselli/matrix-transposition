@@ -8,7 +8,7 @@ LLd_miss_rates_dumb = []
 D1_miss_rates_with_blocks = []
 LLd_miss_rates_with_blocks = []
 
-for i in range(25):
+for i in range(13):
 
     r_dumb = pwn.process(
         ["valgrind", "--tool=cachegrind", "--cachegrind-out-file=/dev/null", "./transpose_dumb.out", str(i)]
@@ -53,8 +53,10 @@ for i in range(25):
     print(f"Miss rates for with blocks: {D1_miss_rate_with_blocks}%, {LLd_miss_rate_with_blocks}%")
 
 
-plt.plot(D1_miss_rates_dumb, label="Dumb")
-plt.plot(D1_miss_rates_with_blocks, label="With blocks")
+plt.plot(D1_miss_rates_dumb, label="Dumb (D1)")
+plt.plot(D1_miss_rates_with_blocks, label="With blocks (D1)")
+plt.plot(LLd_miss_rates_dumb, label="Dumb (LLd)")
+plt.plot(LLd_miss_rates_with_blocks, label="With blocks (LLd)")
 plt.xlabel("Matrix size")
 plt.ylabel("D1 miss rate (%)")
 plt.legend()
