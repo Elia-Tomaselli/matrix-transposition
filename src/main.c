@@ -9,14 +9,14 @@
 int main(int argc, char** argv) {
   if (argc != 2) {
     fprintf(stderr, "Usage: %s <exponent>\n", argv[0]);
-    return EXIT_FAILURE;
+    return 1;
   }
 
   uint8_t exponent = (uint8_t)atoi(argv[1]);
 
   if (exponent == 0 && argv[1][0] != '0') {
     fprintf(stderr, "Error: Invalid input\n");
-    return EXIT_FAILURE;
+    return 1;
   }
 
   // Same as raising 2 to the power of exponent
@@ -25,27 +25,34 @@ int main(int argc, char** argv) {
   matrix_type** matrix = matrix_alloc(size);
   if (matrix == NULL) {
     fprintf(stderr, "Error: Failed to allocate memory\n");
-    return EXIT_FAILURE;
+    return 1;
   }
 
   srand(time(NULL));
   matrix_init_random(matrix, size);
 
-  matrix_type** transposed_matrix = matrix_alloc(size);
-  if (transposed_matrix == NULL) {
+  matrix_type** matrixT = matrix_alloc(size);
+  if (matrixT == NULL) {
     fprintf(stderr, "Error: Failed to allocate memory\n");
     matrix_free(matrix);
-    return EXIT_FAILURE;
+    return 1;
   }
 
-  matrix_transpose_dumb(transposed_matrix, matrix, size);
-  // matrix_transpose_rec(transposed_matrix, matrix, size);
+  clock_t start = clock();
 
-  matrix_print(matrix, size);
-  matrix_print(transposed_matrix, size);
+  // matrix_transpose_dumb(matrixT, matrix, size);
+  matrix_transpose_with_blocks(matrixT, matrix, size);
+
+  clock_t end = clock();
+
+  double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+  printf("Time: %lf\n", time_taken);
+
+  // matrix_print(matrix, size);
+  // matrix_print(matrixT, size);
 
   matrix_free(matrix);
-  matrix_free(transposed_matrix);
+  matrix_free(matrixT);
 
   return 0;
 }
