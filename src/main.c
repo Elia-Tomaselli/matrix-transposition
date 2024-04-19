@@ -6,21 +6,9 @@
 
 #include "matrix.h"
 
-void init_matrix_random(float** matrix, size_t rows, size_t cols) {
-  for (size_t i = 0; i < rows; i++) {
-    for (size_t j = 0; j < cols; j++) {
-      matrix[i][j] = (float)rand() / RAND_MAX;
-    }
-  }
-}
-
-int pow2(int exponent) {
-  return 1 << exponent;
-}
-
 int main(int argc, char** argv) {
   if (argc != 2) {
-    printf("Usage: %s <exponent>\n", argv[0]);
+    fprintf(stderr, "Usage: %s <exponent>\n", argv[0]);
     return EXIT_FAILURE;
   }
 
@@ -31,28 +19,33 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  uint64_t matrix_size = pow2(exponent);
+  // Same as raising 2 to the power of exponent
+  uint64_t size = 1 << exponent;
 
-  float** matrix = matrix_alloc(matrix_size, matrix_size);
-
+  matrix_type** matrix = matrix_alloc(size);
   if (matrix == NULL) {
     fprintf(stderr, "Error: Failed to allocate memory\n");
     return EXIT_FAILURE;
   }
 
   srand(time(NULL));
-  init_matrix_random(matrix, matrix_size, matrix_size);
+  matrix_init_random(matrix, size);
 
-  float** transpose = matrix_transpose(matrix, matrix_size, matrix_size);
-
-  if (transpose == NULL) {
+  matrix_type** transposed_matrix = matrix_alloc(size);
+  if (transposed_matrix == NULL) {
     fprintf(stderr, "Error: Failed to allocate memory\n");
-    matrix_free(matrix, matrix_size);
+    matrix_free(matrix);
     return EXIT_FAILURE;
   }
 
-  matrix_free(matrix, matrix_size);
-  matrix_free(transpose, matrix_size);
+  matrix_transpose_dumb(transposed_matrix, matrix, size);
+  // matrix_transpose_rec(transposed_matrix, matrix, size);
+
+  matrix_print(matrix, size);
+  matrix_print(transposed_matrix, size);
+
+  matrix_free(matrix);
+  matrix_free(transposed_matrix);
 
   return 0;
 }
