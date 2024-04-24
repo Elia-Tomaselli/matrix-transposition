@@ -35,9 +35,15 @@ for i in range(25):
     times_for_with_blocks.append(time_with_blocks)
     print(f"{i} takes {time_dumb}s for dumb and {time_with_blocks}s for with blocks")
 
+bandwidth_for_dumb = [((1 << i) / time) for i, time in enumerate(times_for_dumb)]
+bandwidth_for_with_blocks = [((1 << i) / time) for i, time in enumerate(times_for_with_blocks)]
+
+bandwidth_for_dumb = map(bandwidth_for_dumb, lambda x: x * 1_000_000)
+bandwidth_for_with_blocks = map(bandwidth_for_with_blocks, lambda x: x * 1_000_000)
+
 plt.xlabel("Matrix size")
-plt.ylabel("Time (s)")
-plt.title("Matrix size vs Time")
+plt.ylabel("Memory Bandwidth (B/s)")
+plt.title("Matrix size vs Memory Bandwidth")
 
 plt.grid(True)
 
