@@ -1,1 +1,0 @@
-valgrind --tool=cachegrind ./transpose.out $1

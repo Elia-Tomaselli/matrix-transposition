@@ -1,47 +1,32 @@
 # Usage: "make" or "make all" to compile the source files and create the executable
-#        "make debug" to compile the source files with debug flags
 # 			 "make run <args>" to run the executable with arguments
 #        "make clean" to remove object files and executable
 
 CC = gcc
 CFLAGS = -O3 -Wall -Wextra
-DEBUG_CFLAGS = -g
-
 SRCDIR = src
 OBJDIR = obj
 SOURCES := $(wildcard $(SRCDIR)/*.c)
 OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-TARGET = transpose
-
-# Update the target extension based on the OS
-ifeq ($(OS),Windows_NT)
-	TARGET := $(TARGET).exe
-else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		TARGET := $(TARGET).out
-	endif
-	ifeq ($(UNAME_S),Darwin)
-		TARGET := $(TARGET).app
-	endif
-endif
+TARGET = transpose.out
 
 all: $(TARGET)
-
-debug: CFLAGS += $(DEBUG_CFLAGS)
-debug: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
 # Ensure obj directory exists before compiling any source file
 $(OBJECTS): | $(OBJDIR)
+$(OBJECTS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h # In case the source file has a corresponding header file and it changes, the object file will be recompiled
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # If the first argument is "run"...
 ifeq (run,$(firstword $(MAKECMDGOALS)))
@@ -60,4 +45,4 @@ clean:
 	rm -rf $(OBJDIR)
 	rm -f $(TARGET)
 
-.PHONY: all debug run clean
+.PHONY: all run clean

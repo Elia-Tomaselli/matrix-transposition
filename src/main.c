@@ -40,10 +40,8 @@ int main(int argc, char** argv) {
 
   clock_t start = clock();
 
-  // matrix_transpose_dumb(matrixT, matrix, size);
+  // matrix_transpose_naive(matrixT, matrix, size);
   matrix_transpose_with_blocks(matrixT, matrix, size);
-  // matrix_transpose_dumb_in_place(matrix, size);
-  // matrix_transpose_with_blocks_in_place(matrix, size);
 
   clock_t end = clock();
 
