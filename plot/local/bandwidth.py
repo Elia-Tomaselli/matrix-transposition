@@ -38,8 +38,11 @@ for i in range(MAX_SIZE):
 # Size of float times size of matrix squared in bytes
 matrix_byte_sizes = [4 * ((1 << i) ** 2) for i in range(MAX_SIZE)]
 
-bandwidth_for_naive = [matrix_byte_sizes[i] / max(time, 1e-6) for i, time in enumerate(times_for_naive)]
-bandwidth_for_with_blocks = [matrix_byte_sizes[i] / max(time, 1e-6) for i, time in enumerate(times_for_with_blocks)]
+times_for_naive = [max(1e-6, time) for time in times_for_naive]
+times_for_with_blocks = [max(1e-6, time) for time in times_for_with_blocks]
+
+bandwidth_for_naive = [matrix_byte_sizes[i] / time for i, time in enumerate(times_for_naive)]
+bandwidth_for_with_blocks = [matrix_byte_sizes[i] / time for i, time in enumerate(times_for_with_blocks)]
 
 bandwidth_for_naive = [bandwidth / 1e9 for bandwidth in bandwidth_for_naive]
 bandwidth_for_with_blocks = [bandwidth / 1e9 for bandwidth in bandwidth_for_with_blocks]

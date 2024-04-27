@@ -41,5 +41,8 @@ for i in range(MAX_SIZE):
     times_for_with_blocks.append(time_with_blocks)
     print(f"{i} takes {time_naive}s for naive and {time_with_blocks}s for with blocks")
 
+times_for_naive = [max(1e-6, time) for time in times_for_naive]
+times_for_with_blocks = [max(1e-6, time) for time in times_for_with_blocks]
+
 print(times_for_naive)
 print(times_for_with_blocks)

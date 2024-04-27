@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pwn
+import math
 
 pwn.context.timeout = pwn.pwnlib.timeout.Timeout.forever
 pwn.context.log_level = "error"
@@ -43,6 +44,12 @@ plt.title("Matrix size vs Time")
 plt.xticks(np.arange(MAX_SIZE), [f"2^{i}" for i in range(MAX_SIZE)], rotation=60)
 
 plt.grid(True)
+
+times_for_naive = [max(1e-6, time) for time in times_for_naive]
+times_for_with_blocks = [max(1e-6, time) for time in times_for_with_blocks]
+
+# times_for_naive = [math.log10(time) for time in times_for_naive]
+# times_for_with_blocks = [math.log10(time) for time in times_for_with_blocks]
 
 plt.plot(range(len(times_for_naive)), times_for_naive, label="naive")
 plt.plot(range(len(times_for_with_blocks)), times_for_with_blocks, label="With blocks")
