@@ -5,23 +5,23 @@ import pwn
 pwn.context.timeout = pwn.pwnlib.timeout.Timeout.forever
 pwn.context.log_level = "error"
 
-times_for_naive = []
+# times_for_naive = []
 times_for_with_blocks = []
 
 MAX_SIZE = 16
 
 for i in range(MAX_SIZE):
-    r_naive = pwn.process(["./transpose_naive.out", str(i)])
-    r_naive.recvuntil(b"Time: ")
-    time_naive = float(r_naive.recvline().strip().decode())
-    r_naive.recvall()
-    ret = r_naive.poll()
+    # r_naive = pwn.process(["./transpose_naive.out", str(i)])
+    # r_naive.recvuntil(b"Time: ")
+    # time_naive = float(r_naive.recvline().strip().decode())
+    # r_naive.recvall()
+    # ret = r_naive.poll()
 
-    if ret is not None and ret != 0:
-        print(f"Error for naive: {ret}")
-        break
+    # if ret is not None and ret != 0:
+    #     print(f"Error for naive: {ret}")
+    #     break
 
-    r_with_blocks = pwn.process(["./transpose_with_blocks.out", str(i)])
+    r_with_blocks = pwn.process(["./transpose_with_blocks3.out", str(i)])
     r_with_blocks.recvuntil(b"Time: ")
     time_with_blocks = float(r_with_blocks.recvline().strip().decode())
     r_with_blocks.recvall()
@@ -31,20 +31,20 @@ for i in range(MAX_SIZE):
         print(f"Error for with blocks: {ret}")
         break
 
-    times_for_naive.append(time_naive)
+    # times_for_naive.append(time_naive)
     times_for_with_blocks.append(time_with_blocks)
-    print(f"{i} takes {time_naive}s for naive and {time_with_blocks}s for with blocks")
+    # print(f"{i} takes {time_naive}s for naive and {time_with_blocks}s for with blocks")
 
 # Size of float times size of matrix squared in bytes
 matrix_byte_sizes = [4 * ((1 << i) ** 2) for i in range(MAX_SIZE)]
 
-times_for_naive = [max(1e-6, time) for time in times_for_naive]
+# times_for_naive = [max(1e-6, time) for time in times_for_naive]
 times_for_with_blocks = [max(1e-6, time) for time in times_for_with_blocks]
 
-bandwidth_for_naive = [matrix_byte_sizes[i] / time for i, time in enumerate(times_for_naive)]
+# bandwidth_for_naive = [matrix_byte_sizes[i] / time for i, time in enumerate(times_for_naive)]
 bandwidth_for_with_blocks = [matrix_byte_sizes[i] / time for i, time in enumerate(times_for_with_blocks)]
 
-bandwidth_for_naive = [bandwidth / 1e9 for bandwidth in bandwidth_for_naive]
+# bandwidth_for_naive = [bandwidth / 1e9 for bandwidth in bandwidth_for_naive]
 bandwidth_for_with_blocks = [bandwidth / 1e9 for bandwidth in bandwidth_for_with_blocks]
 
 plt.xlabel("Matrix size")
@@ -56,10 +56,10 @@ plt.xticks(np.arange(MAX_SIZE), [f"2^{i}" for i in range(MAX_SIZE)], rotation=60
 
 plt.grid(True)
 
-plt.plot(range(len(bandwidth_for_naive)), bandwidth_for_naive, label="naive")
-plt.plot(range(len(bandwidth_for_with_blocks)), bandwidth_for_with_blocks, label="With blocks")
+# plt.plot(range(len(bandwidth_for_naive)), bandwidth_for_naive, label="naive")
+plt.plot(range(len(bandwidth_for_with_blocks)), bandwidth_for_with_blocks, label="with blocks")
 
-plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), fancybox=True, shadow=True, ncol=2)
+# plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), fancybox=True, shadow=True, ncol=2)
 
 # Hide top and right spines
 plt.gca().spines["top"].set_visible(False)

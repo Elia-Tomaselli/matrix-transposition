@@ -3,7 +3,7 @@
 #        "make clean" to remove object files and executable
 
 CC = gcc
-CFLAGS = -O3 -Wall -Wextra
+CFLAGS = -O0 -Wall -Wextra
 SRCDIR = src
 OBJDIR = obj
 SOURCES := $(wildcard $(SRCDIR)/*.c)

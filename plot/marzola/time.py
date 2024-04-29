@@ -4,7 +4,7 @@ import re
 times_for_naive = []
 times_for_with_blocks = []
 
-MAX_SIZE = 2
+MAX_SIZE = 16
 
 for i in range(MAX_SIZE):
     process = subprocess.Popen(
