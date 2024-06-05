@@ -86,7 +86,7 @@ def compile_and_copy(naive: bool) -> None:
     shutil.copy(os.path.join(gpu_dir, "transpose.out"), os.path.join(executables_dir, executable_name))
 
 
-def get_benchmark(naive: bool, exponent: int) -> list[int]:
+def get_benchmark(naive: bool, exponent: int):
     LOOPS = 5
 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -95,7 +95,7 @@ def get_benchmark(naive: bool, exponent: int) -> list[int]:
     # Run the benchmark
     os.chdir(executables_dir)
     executable_name = f"./transpose_{'naive' if naive else 'optimized'}.out"
-    p = pwn.process([executable_name, str(exponent)])
+    p = pwn.process(["./run.sh", executable_name, str(exponent)])
 
     times = []
     for _ in range(LOOPS):
