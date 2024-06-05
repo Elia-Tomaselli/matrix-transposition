@@ -52,5 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Custom
+.vscode/
 obj/
-out
+images/
+executables/
