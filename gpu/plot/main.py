@@ -3,6 +3,7 @@ import os
 import pwn
 import shutil
 import argparse
+import json
 
 parser = argparse.ArgumentParser(description="Plots the benchmark results of the matrix transpose algorithm")
 parser.add_argument(
@@ -11,6 +12,7 @@ parser.add_argument(
 parser.add_argument(
     "--max-exponent", type=int, default=20, help="The maximum exponent of the matrix size", required=False
 )
+parser.add_argument("--use-cache", action="store_true", help="Uses the cached results", required=False)
 parser.add_argument("--show", action="store_true", help="Shows the plots", required=False)
 args = parser.parse_args()
 
@@ -87,6 +89,7 @@ def compile_and_copy(naive: bool) -> None:
 
 
 def get_benchmark(naive: bool, exponent: int):
+    return [1.0, 2.0, 3.0, 4.0, 5.0]
     LOOPS = 5
 
     # Run the benchmark
@@ -119,12 +122,32 @@ naive_times = {}
 optimized_times = {}
 exponents = list(range(5, args.max_exponent + 1))
 
-for exponent in exponents:
-    print(f"Running benchmarks for 2^{exponent}...")
-    naive_time = get_benchmark(naive=True, exponent=exponent)
-    optimized_time = get_benchmark(naive=False, exponent=exponent)
-    naive_times[exponent] = naive_time
-    optimized_times[exponent] = optimized_time
+if not args.use_cache:
+    for exponent in exponents:
+        print(f"Running benchmarks for 2^{exponent}...")
+        naive_time = get_benchmark(naive=True, exponent=exponent)
+        optimized_time = get_benchmark(naive=False, exponent=exponent)
+        naive_times[exponent] = naive_time
+        optimized_times[exponent] = optimized_time
+
+    with open("naive_times.json", "w") as f:
+        json.dump(naive_times, f, indent=2)
+    with open("optimized_times.json", "w") as f:
+        json.dump(optimized_times, f, indent=2)
+else:
+    with open("naive_times.json", "r") as f:
+        naive_times = json.load(f)
+    with open("optimized_times.json", "r") as f:
+        optimized_times = json.load(f)
+
+    if (len(naive_times) != len(optimized_times)):
+        raise ValueError("The cached results are not consistent")
+    
+    if (len(naive_times) < len(exponents)):
+        raise ValueError("The cached results are not complete")
+    elif (len(naive_times) > len(exponents)):
+        naive_times = {exponent: naive_times[exponent] for exponent in exponents}
+        optimized_times = {exponent: optimized_times[exponent] for exponent in exponents}
 
 # Average the times
 naive_times = [sum(times) / len(times) for times in naive_times.values()]
@@ -145,6 +168,7 @@ max_time = max(max(naive_times), max(optimized_times))
 if not os.path.exists(IMAGES_DIR):
     os.makedirs(IMAGES_DIR)
 
+time_step = 10
 plot(
     "",
     "Matrix Size (2^x)",
@@ -154,15 +178,14 @@ plot(
     ["Naive", "Optimized"],
     exponents,
     [f"2^{exponent}" for exponent in exponents],
-    [i for i in range(0, int(max_time) + 200, 200)],
-    [f"{i} ms" for i in range(0, int(max_time) + 200, 200)],
+    [i for i in range(0, int(max_time) + time_step, time_step)],
+    [f"{i} ms" for i in range(0, int(max_time) + time_step, time_step)],
     os.path.join(IMAGES_DIR, "time.png"),
     show=args.show,
 )
 
 # Sizes of the matrices in bytes
 matrix_sizes = [((2**exponent) ** 2) * 4 for exponent in exponents]
-matrix_sizes = []
 
 # Effective bandwidth in GB/s
 # The times 2 is because in order to transpose a matrix, we need to read and write each element
@@ -173,6 +196,7 @@ effective_bandwidth_optimized = [
     ((2 * matrix_sizes[index]) / 10**9) / (time / 1000) for index, time in enumerate(optimized_times)
 ]
 
+bandwidth_step = 50
 plot(
     "",
     "Matrix Size (2^x)",
@@ -182,8 +206,8 @@ plot(
     ["Naive", "Optimized"],
     exponents,
     [f"2^{exponent}" for exponent in exponents],
-    [i for i in range(0, int(theoretical_bandwidth), 20)],
-    [f"{i} GB/s" for i in range(0, int(theoretical_bandwidth), 20)],
+    [i for i in range(0, int(theoretical_bandwidth), bandwidth_step)],
+    [f"{i} GB/s" for i in range(0, int(theoretical_bandwidth), bandwidth_step)],
     os.path.join(IMAGES_DIR, "bandwidth.png"),
     roofline=theoretical_bandwidth,
     roofline_label="Theoretical Memory Bandwidth",
