@@ -89,8 +89,10 @@ def get_benchmark(naive: bool, exponent: int):
     LOOPS = 5
 
     # Run the benchmark
-    os.chdir(EXECUTABLES_DIR)
     executable_name = f"./transpose_{'naive' if naive else 'optimized'}.out"
+    executable_name = os.path.join(EXECUTABLES_DIR, executable_name)
+    
+    os.chdir(CURR_DIR)
     p = pwn.process(["./run.sh", executable_name, str(exponent)])
 
     times = []
