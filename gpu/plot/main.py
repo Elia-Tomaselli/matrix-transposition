@@ -15,6 +15,9 @@ parser.add_argument(
 parser.add_argument("--show", action="store_true", help="Shows the plots", required=False)
 args = parser.parse_args()
 
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+GPU_DIR = os.path.dirname(CURR_DIR)
+EXECUTABLES_DIR = os.path.join(CURR_DIR, "executables")
 
 def plot(
     title,
@@ -69,12 +72,8 @@ def plot(
 
 # Compiles the C code and copies the executable "transpose.out" to the current directory
 def compile_and_copy(naive: bool) -> None:
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    executables_dir = os.path.join(curr_dir, "executables")
-    gpu_dir = os.path.split(curr_dir)[0]
-
     # Compile the C code
-    os.chdir(gpu_dir)
+    os.chdir(GPU_DIR)
     os.system("make clean")
     if naive:
         os.system("make naive")
@@ -83,17 +82,14 @@ def compile_and_copy(naive: bool) -> None:
 
     # Copy the executable to the current directory
     executable_name = f"transpose_{'naive' if naive else 'optimized'}.out"
-    shutil.copy(os.path.join(gpu_dir, "transpose.out"), os.path.join(executables_dir, executable_name))
+    shutil.copy(os.path.join(GPU_DIR, "transpose.out"), os.path.join(EXECUTABLES_DIR, executable_name))
 
 
 def get_benchmark(naive: bool, exponent: int):
     LOOPS = 5
 
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    executables_dir = os.path.join(curr_dir, "executables")
-
     # Run the benchmark
-    os.chdir(executables_dir)
+    os.chdir(EXECUTABLES_DIR)
     executable_name = f"./transpose_{'naive' if naive else 'optimized'}.out"
     p = pwn.process(["./run.sh", executable_name, str(exponent)])
 
