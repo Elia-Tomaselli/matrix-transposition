@@ -1,9 +1,3 @@
-# Usage: "make" or "make all" to compile the source files and create the executable
-#				 "make optimized" or "make naive" to compile the source files and create the executable with the optimized or naive version of the transpose kernel
-#				 Additionally a different TILE_SIZE can be specified with "TILE_SIZE=<your_tile_size>" before the make command, the default TILE_SIZE is 32 
-# 			 "make run <args>" to run the executable with arguments
-#        "make clean" to remove object files and executable
-
 .DEFAULT_GOAL := naive
 
 CC = nvcc

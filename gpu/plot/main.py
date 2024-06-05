@@ -89,7 +89,6 @@ def compile_and_copy(naive: bool) -> None:
 
 
 def get_benchmark(naive: bool, exponent: int):
-    return [1.0, 2.0, 3.0, 4.0, 5.0]
     LOOPS = 5
 
     # Run the benchmark
