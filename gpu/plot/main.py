@@ -13,6 +13,7 @@ parser.add_argument(
     "--max-exponent", type=int, default=20, help="The maximum exponent of the matrix size", required=False
 )
 parser.add_argument("--use-cache", action="store_true", help="Uses the cached results", required=False)
+parser.add_argument("--tile-size", type=int, help="The tile size to use for the benchmark", required=False)
 parser.add_argument("--show", action="store_true", help="Shows the plots", required=False)
 args = parser.parse_args()
 
@@ -74,16 +75,14 @@ def plot(
 
 
 # Compiles the C code and copies the executable "transpose.out" to the current directory
-def compile_and_copy(naive: bool) -> None:
-    # Compile the C code
+def compile_and_copy(naive: bool, tile_size: int = None) -> None:
     os.chdir(GPU_DIR)
     os.system("make clean")
-    if naive:
-        os.system("make naive")
-    else:
-        os.system("make optimized")
+    
+    compile_command = f"make {'naive' if naive else 'optimized'}"
+    compile_command += f" TILE_SIZE={tile_size}" if tile_size is not None else ""
+    os.system(compile_command)
 
-    # Copy the executable to the current directory
     executable_name = f"transpose_{'naive' if naive else 'optimized'}.out"
     shutil.copy(os.path.join(GPU_DIR, "transpose.out"), os.path.join(EXECUTABLES_DIR, executable_name))
 
@@ -113,8 +112,8 @@ def get_benchmark(naive: bool, exponent: int):
 if not args.skip_compilation:
     if not os.path.exists(EXECUTABLES_DIR):
         os.makedirs(EXECUTABLES_DIR)
-    compile_and_copy(naive=True)
-    compile_and_copy(naive=False)
+    compile_and_copy(naive=True, tile_size=args.tile_size)
+    compile_and_copy(naive=False, tile_size=args.tile_size)
 
 # Run the benchmarks
 naive_times = {}

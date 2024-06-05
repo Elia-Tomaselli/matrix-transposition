@@ -8,6 +8,10 @@ CFLAGS += --gpu-architecture=sm_80 -m64
 # NVIDIA GeForce RTX 4060 Ti
 # CFLAGS += --gpu-architecture=sm_89 -m64
 
+ifdef TILE_SIZE 
+CFLAGS += -DTILE_SIZE=$(TILE_SIZE)
+endif
+
 SRCDIR = src
 OBJDIR = obj
 SOURCES := $(wildcard $(SRCDIR)/*.cu)
