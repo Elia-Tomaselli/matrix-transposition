@@ -17,6 +17,8 @@ args = parser.parse_args()
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 GPU_DIR = os.path.dirname(CURR_DIR)
 EXECUTABLES_DIR = os.path.join(CURR_DIR, "executables")
+IMAGES_DIR = os.path.join(CURR_DIR, "images")
+
 
 def plot(
     title,
@@ -90,7 +92,7 @@ def get_benchmark(naive: bool, exponent: int):
     # Run the benchmark
     executable_name = f"./transpose_{'naive' if naive else 'optimized'}.out"
     executable_name = os.path.join(EXECUTABLES_DIR, executable_name)
-    
+
     os.chdir(CURR_DIR)
     p = pwn.process(["./run.sh", executable_name, str(exponent)])
 
@@ -105,12 +107,10 @@ def get_benchmark(naive: bool, exponent: int):
     return times
 
 
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-
 # Compile and copy the executables to the current directory
 if not args.skip_compilation:
-    if not os.path.exists(os.path.join(curr_dir, "executables")):
-        os.makedirs(os.path.join(curr_dir, "executables"))
+    if not os.path.exists(EXECUTABLES_DIR):
+        os.makedirs(EXECUTABLES_DIR)
     compile_and_copy(naive=True)
     compile_and_copy(naive=False)
 
@@ -142,6 +142,9 @@ theoretical_bandwidth = ((memory_clock_rate * 10**6) * (memory_bus_width / 8) * 
 
 max_time = max(max(naive_times), max(optimized_times))
 
+if not os.path.exists(IMAGES_DIR):
+    os.makedirs(IMAGES_DIR)
+
 plot(
     "",
     "Matrix Size (2^x)",
@@ -153,7 +156,7 @@ plot(
     [f"2^{exponent}" for exponent in exponents],
     [i for i in range(0, int(max_time) + 200, 200)],
     [f"{i} ms" for i in range(0, int(max_time) + 200, 200)],
-    os.path.join(curr_dir, "images", "time_vs_matrix_size.png"),
+    os.path.join(IMAGES_DIR, "time.png"),
     show=args.show,
 )
 
@@ -181,7 +184,7 @@ plot(
     [f"2^{exponent}" for exponent in exponents],
     [i for i in range(0, int(theoretical_bandwidth), 20)],
     [f"{i} GB/s" for i in range(0, int(theoretical_bandwidth), 20)],
-    os.path.join(curr_dir, "images", "effective_bandwidth_vs_matrix_size.png"),
+    os.path.join(IMAGES_DIR, "bandwidth.png"),
     roofline=theoretical_bandwidth,
     roofline_label="Theoretical Memory Bandwidth",
     show=args.show,
