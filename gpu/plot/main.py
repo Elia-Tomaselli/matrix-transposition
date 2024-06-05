@@ -1,4 +1,3 @@
-from pprint import pprint
 import matplotlib.pyplot as plt
 import os
 import pwn
@@ -160,15 +159,15 @@ plot(
 
 # Sizes of the matrices in bytes
 matrix_sizes = [((2**exponent) ** 2) * 4 for exponent in exponents]
-print(f"Matrix size for exponent {5}: {matrix_sizes[0]}")
+matrix_sizes = []
 
 # Effective bandwidth in GB/s
 # The times 2 is because in order to transpose a matrix, we need to read and write each element
 effective_bandwidth_naive = [
-    ((matrix_sizes[index] * 2) / 10**9) / (time / 1000) for index, time in enumerate(naive_times)
+    ((2 * matrix_sizes[index]) / 10**9) / (time / 1000) for index, time in enumerate(naive_times)
 ]
 effective_bandwidth_optimized = [
-    ((matrix_sizes[index] * 2) / 10**9) / (time / 1000) for index, time in enumerate(optimized_times)
+    ((2 * matrix_sizes[index]) / 10**9) / (time / 1000) for index, time in enumerate(optimized_times)
 ]
 
 plot(

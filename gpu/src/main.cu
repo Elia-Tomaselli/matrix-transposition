@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
   int block_size = TILE_SIZE * TILE_SIZE;
   int grid_size = size * size / block_size;
-  printf("Block size: %d\tGrid size: %d\n", block_size, grid_size);
+  // printf("Block size: %d\tGrid size: %d\n", block_size, grid_size);
 
   cudaEvent_t start;
   gpuErrchk(cudaEventCreate(&start));
