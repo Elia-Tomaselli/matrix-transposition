@@ -56,3 +56,6 @@ dkms.conf
 obj/
 images/
 executables/
+
+gpu/plot/naive_times.json
+gpu/plot/optimized_times.json
